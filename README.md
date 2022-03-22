@@ -4,7 +4,7 @@ This map of Black-owned and Black-serving media outlets across the US accompanie
 
 🗺️ **[View the map](https://ccmnewmarkj.github.io/bmmap/)**
 
-**Sources**
+**Sources**:
 
 - Data: [Black Media Directory](https://airtable.com/shrKbdiGOaRdsSIIW)
 - Map: [Sheet Mapper](https://labs.mapbox.com/education/impact-tools/sheet-mapper/) (Mapbox)
