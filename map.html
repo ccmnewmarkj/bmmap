@@ -75,7 +75,7 @@
       }
 
       .mapboxgl-popup-content .outlet-info {
-        background: #fff;
+        background: #fdfdfd;
         margin: 0;
         display: block;
         padding: 10px 20px;
@@ -306,7 +306,7 @@
 
                   const website = e.features[0].properties["URL"]
                     ? `<a href='` + e.features[0].properties["URL"] + `' target='_blank'>Website</a>`
-                    : `<span style='color:gray;'>Website unknown</span>`
+                    : `<span style='color:#666666;'>Website unknown</span>`
 
                   const location =
                     e.features[0].properties["Approximate Location Only"] === "yes"
