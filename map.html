@@ -3,13 +3,22 @@
   <head>
     <meta charset="utf-8" />
     <title>Black Media Map | Center for Community Media</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
     <script src="https://npmcdn.com/csv2geojson@latest/csv2geojson.js"></script>
-    <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet" />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
@@ -159,6 +168,7 @@
         text-align: center;
         text-decoration: none;
         font: 700 0.8em "Poppins", "Sans-Serif";
+        cursor: pointer;
       }
 
       .mapboxgl-ctrl-top-right .mapboxgl-ctrl-fullscreen {
@@ -177,32 +187,50 @@
       Basemap: https://blog.mapbox.com/designing-moonlight-a-new-custom-map-d25afec2cc6e
     -->
     <div id="map"></div>
-    <button type="button" class="reset-zoom" onClick="reCenterMap()">RESET ZOOM</button>
+    <button type="button" class="reset-zoom" onClick="reCenterMap()">
+      RESET ZOOM
+    </button>
     <div id="geocoder" class="geocoder"></div>
     <div id="search" class="search"></div>
 
     <script>
-      const transformRequest = (url, resourceType) => {
-        const isMapboxRequest = url.slice(8, 22) === "api.mapbox.com" || url.slice(10, 26) === "tiles.mapbox.com";
+      var transformRequest = (url, resourceType) => {
+        var isMapboxRequest =
+          url.slice(8, 22) === "api.mapbox.com" ||
+          url.slice(10, 26) === "tiles.mapbox.com";
         return {
-          url: isMapboxRequest ? url.replace("?", "?pluginName=sheetMapper&") : url,
+          url: isMapboxRequest
+            ? url.replace("?", "?pluginName=sheetMapper&")
+            : url,
         };
       };
 
-      mapboxgl.accessToken = "pk.eyJ1IjoiamNjY20iLCJhIjoiY2wwMG1wanFrMDYzdTNrcGhtcDg4MXlzZyJ9.7xxGLWAu72x0_vKWTYJFJw";
+      mapboxgl.accessToken =
+        "pk.eyJ1IjoiamNjY20iLCJhIjoiY2wwMG1wanFrMDYzdTNrcGhtcDg4MXlzZyJ9.7xxGLWAu72x0_vKWTYJFJw";
+
       const map = new mapboxgl.Map({
-        container: "map",
-        style: "mapbox://styles/jcccm/cl01j7waj001215quv3w9wwrr", // "mapbox://styles/mapbox/light-v10",
+        container: "map", // container id
+        style: "mapbox://styles/mapbox/light-v11",
         center: [-98.579, 38.828],
         zoom: 4,
         minZoom: 4,
         maxZoom: 13,
         transformRequest: transformRequest,
       });
-   
-      (async function() {
-      const csvData = await d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQQOrd0rWLjilcZhDVznucevMH27oH4pcvIt6BiqtiXmsunLXvWDdOOL0DNWOWp3kpz92TVfSpRwD_4/pub?gid=1513069095&single=true&output=csv");
-      csv2geojson.csv2geojson(
+
+      $(document).ready(function () {
+        $.ajax({
+          type: "GET",
+          //YOUR TURN: Replace with csv export link
+          url: "https://docs.google.com/spreadsheets/d/1uvy43lqhO2lnEoUJiUwV4NSUqWL77fbjWYof35FbRp8/gviz/tq?tqx=out:csv&sheet=directory",
+          dataType: "text",
+          success: function (csvData) {
+            makeGeoJSON(csvData);
+          },
+        });
+
+        function makeGeoJSON(csvData) {
+          csv2geojson.csv2geojson(
             csvData,
             {
               latfield: "Latitude",
@@ -210,14 +238,14 @@
               delimiter: ",",
             },
             function (err, data) {
-              map.on("load", () => {
+              map.on("load", function () {
                 map.addSource("csvData", {
                   type: "geojson",
                   data: data,
                   cluster: true,
                   clusterMaxZoom: 7, // Max zoom to cluster points on
                   clusterRadius: 65, // Radius of cluster when clustering (default 50)
-                })
+                });
 
                 map.addLayer({
                   id: "clusters",
@@ -226,10 +254,26 @@
                   filter: ["has", "point_count"],
                   paint: {
                     // Yellow, 25px radius when point count is <20
-                    "circle-color": ["step", ["get", "point_count"], "#f2cc8f", 15, "#e07a5f", 40, "#81b29a"],
-                    "circle-radius": ["step", ["get", "point_count"], 25, 15, 30, 40, 35],
+                    "circle-color": [
+                      "step",
+                      ["get", "point_count"],
+                      "#f2cc8f",
+                      15,
+                      "#e07a5f",
+                      40,
+                      "#81b29a",
+                    ],
+                    "circle-radius": [
+                      "step",
+                      ["get", "point_count"],
+                      25,
+                      15,
+                      30,
+                      40,
+                      35,
+                    ],
                   },
-                })
+                });
 
                 map.addLayer({
                   id: "cluster-count",
@@ -241,7 +285,7 @@
                     "text-font": ["Arial Unicode MS Bold"],
                     "text-size": 16,
                   },
-                })
+                });
 
                 map.addLayer({
                   id: "unclustered-point",
@@ -268,44 +312,52 @@
                     "circle-stroke-width": 2,
                     "circle-stroke-color": "#fff",
                   },
-                })
+                });
 
                 // inspect a cluster on click
-                map.on("click", "clusters", e => {
+                map.on("click", "clusters", (e) => {
                   const features = map.queryRenderedFeatures(e.point, {
                     layers: ["clusters"],
-                  })
-                  const clusterId = features[0].properties.cluster_id
-                  map.getSource("csvData").getClusterExpansionZoom(clusterId, (err, zoom) => {
-                    if (err) return
+                  });
+                  const clusterId = features[0].properties.cluster_id;
+                  map
+                    .getSource("csvData")
+                    .getClusterExpansionZoom(clusterId, (err, zoom) => {
+                      if (err) return;
 
-                    map.easeTo({
-                      center: features[0].geometry.coordinates,
-                      zoom: zoom,
-                    })
-                  })
-                })
+                      map.easeTo({
+                        center: features[0].geometry.coordinates,
+                        zoom: zoom,
+                      });
+                    });
+                });
 
                 // popup
-                map.on("click", "unclustered-point", e => {
-                  const coordinates = e.features[0].geometry.coordinates.slice()
+                map.on("click", "unclustered-point", (e) => {
+                  const coordinates =
+                    e.features[0].geometry.coordinates.slice();
 
                   const website = e.features[0].properties["URL"]
-                    ? `<a href='` + e.features[0].properties["URL"] + `' target='_blank'>Website</a>`
-                    : `<span style='color:#666666;'>Website unknown</span>`
+                    ? `<a href='` +
+                      e.features[0].properties["URL"] +
+                      `' target='_blank'>Website</a>`
+                    : `<span style='color:#666666;'>Website unknown</span>`;
 
                   const location =
-                    e.features[0].properties["Approximate Location Only"] === "yes"
+                    e.features[0].properties["Approximate Location Only"] ===
+                    "yes"
                       ? "(Map location approximate)"
-                      : `<span style="display: none;"></span>`
+                      : `<span style="display: none;"></span>`;
 
                   const city = e.features[0].properties["City"]
                     ? e.features[0].properties["City"]
-                    : `<span style="display: none;"></span>`
+                    : `<span style="display: none;"></span>`;
 
                   const notes = e.features[0].properties["Notes"]
-                    ? `<div class="notes"><hr />` + e.features[0].properties["Notes"] + `</div>`
-                    : `<span style="display: none;"></span>`
+                    ? `<div class="notes"><hr />` +
+                      e.features[0].properties["Notes"] +
+                      `</div>`
+                    : `<span style="display: none;"></span>`;
 
                   const description =
                     `<div class="outlet">` +
@@ -319,35 +371,40 @@
                     e.features[0].properties["Media Type"] +
                     `</li><li style="list-style-type: '🧑🏾 '">` +
                     e.features[0].properties["Audience: City/region"] +
-                    `</li><li style="list-style-type: '🌍 '"> ${website}</li></ul></div>${notes}<div class="bottom"></div>`
+                    `</li><li style="list-style-type: '🌍 '"> ${website}</li></ul></div>${notes}<div class="bottom"></div>`;
 
                   // Ensure that if the map is zoomed out such that
                   // multiple copies of the feature are visible, the
                   // popup appears over the copy being pointed to.
                   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+                    coordinates[0] +=
+                      e.lngLat.lng > coordinates[0] ? 360 : -360;
                   }
 
-                  new mapboxgl.Popup().setLngLat(coordinates).setHTML(description).addTo(map)
-                })
+                  new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });
 
                 map.on("mouseenter", "clusters", () => {
-                  map.getCanvas().style.cursor = "pointer"
-                })
+                  map.getCanvas().style.cursor = "pointer";
+                });
                 map.on("mouseleave", "clusters", () => {
-                  map.getCanvas().style.cursor = ""
-                })
+                  map.getCanvas().style.cursor = "";
+                });
 
                 map.on("mouseenter", "unclustered-point", () => {
-                  map.getCanvas().style.cursor = "pointer"
-                })
+                  map.getCanvas().style.cursor = "pointer";
+                });
                 map.on("mouseleave", "unclustered-point", () => {
-                  map.getCanvas().style.cursor = ""
-                })
-              })
+                  map.getCanvas().style.cursor = "";
+                });
+              });
             }
-          )
-    })();
+          );
+        }
+      });
 
       // Geocoding control:
       // https://docs.mapbox.com/help/getting-started/geocoding/
