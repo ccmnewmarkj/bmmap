@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Black Media Map | Center for Community Media</title>
-    <meta
-      name="viewport"
-      content="initial-scale=1,maximum-scale=1,user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link
@@ -221,8 +218,7 @@
       $(document).ready(function () {
         $.ajax({
           type: "GET",
-          //YOUR TURN: Replace with csv export link
-          url: "https://docs.google.com/spreadsheets/d/1uvy43lqhO2lnEoUJiUwV4NSUqWL77fbjWYof35FbRp8/gviz/tq?tqx=out:csv&sheet=directory",
+          url: "bm-directory.csv",
           dataType: "text",
           success: function (csvData) {
             makeGeoJSON(csvData);
