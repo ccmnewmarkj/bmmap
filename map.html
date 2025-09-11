@@ -340,8 +340,7 @@
                     : `<span style='color:#666666;'>Website unknown</span>`;
 
                   const location =
-                    e.features[0].properties["Approximate Location Only"] ===
-                    "yes"
+                    e.features[0].properties["Approximate Location"] === "yes"
                       ? "(Map location approximate)"
                       : `<span style="display: none;"></span>`;
 
